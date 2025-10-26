@@ -25,21 +25,22 @@ const FILLER_WORDS = ["um", "uh", "like", "you know", "so", "basically", "actual
 
 export const analyzeAudio = async (file: File): Promise<AnalysisResult> => {
   try {
-    // Convert audio to base64 in chunks to prevent memory issues
+    // Convert audio to base64 properly
     const arrayBuffer = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    const chunkSize = 32768;
-    let base64Audio = '';
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    const chunkSize = 0x8000; // 32KB chunks to prevent stack overflow
     
-    for (let i = 0; i < uint8Array.length; i += chunkSize) {
-      const chunk = uint8Array.slice(i, i + chunkSize);
-      const chunkString = Array.from(chunk).map(byte => String.fromCharCode(byte)).join('');
-      base64Audio += btoa(chunkString);
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+      binary += String.fromCharCode.apply(null, Array.from(chunk));
     }
+    
+    const base64Audio = btoa(binary);
 
-    // Get audio duration
+    // Get audio duration using Web Audio API
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
     const duration = audioBuffer.duration;
 
     // Call transcription edge function

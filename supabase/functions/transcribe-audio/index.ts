@@ -22,12 +22,19 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Decode base64 to binary
+    // Decode base64 to binary safely
     const base64Data = audio.includes(',') ? audio.split(',')[1] : audio;
-    const binaryString = atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+    
+    // Use Uint8Array for proper binary handling
+    const binaryLen = base64Data.length;
+    const bytes = new Uint8Array(binaryLen * 3 / 4);
+    
+    for (let i = 0, j = 0; i < binaryLen; i += 4) {
+      const chunk = base64Data.substring(i, i + 4);
+      const decoded = atob(chunk);
+      for (let k = 0; k < decoded.length; k++) {
+        bytes[j++] = decoded.charCodeAt(k);
+      }
     }
 
     // Create form data with file
