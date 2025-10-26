@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle, Sparkles, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import type { AnalysisResult } from "@/utils/audioAnalyzer";
+import type { AnalysisResult } from "@/utils/comprehensiveAnalyzer";
 
 interface CoachingTabProps {
   data: AnalysisResult | null;

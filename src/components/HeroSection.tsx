@@ -31,7 +31,7 @@ const HeroSection = () => {
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
         size: Math.random() * 2 + 1,
-        hue: Math.random() * 60 + 260, // Purple to cyan range
+        hue: Math.random() * 100 + 180, // Cyan to purple spectrum
       });
     }
 
@@ -90,12 +90,20 @@ const HeroSection = () => {
         style={{ background: "var(--gradient-hero)" }}
       />
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-        <img src={prismLogo} alt="PRISM Logo" className="h-32 mb-6 animate-fade-in" />
-        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          AI Presentation Coach
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl">
-          Transform your speaking skills with real-time AI analysis, filler word detection, and personalized coaching
+        <div className="flex items-center gap-4 mb-6 animate-fade-in">
+          <img src={prismLogo} alt="PRISM Logo" className="h-20 drop-shadow-2xl" />
+          <div className="text-left">
+            <h1 className="text-6xl font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent drop-shadow-lg">
+                PROJECT PRISM
+              </span>
+            </h1>
+            <p className="text-lg text-cyan-300/80 font-medium tracking-wide">AI-Powered Presentation Mastery</p>
+          </div>
+        </div>
+        <p className="text-xl text-gray-300 max-w-2xl leading-relaxed">
+          Transform your speaking skills with real-time AI analysis, filler word detection, and personalized coaching.
+          <span className="block mt-2 text-cyan-400 font-semibold">Upload. Analyze. Excel.</span>
         </p>
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent" />

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Upload, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { analyzeAudio } from "@/utils/audioAnalyzer";
+import { analyzeAudio } from "@/utils/comprehensiveAnalyzer";
 
 interface AudioUploadProps {
   onFileSelect: (file: File | null) => void;
@@ -41,9 +41,10 @@ const AudioUpload = ({ onFileSelect, onAnalysisComplete }: AudioUploadProps) => 
       });
     } catch (error) {
       console.error("Analysis error:", error);
+      const errorMessage = error instanceof Error ? error.message : "There was an error analyzing your audio. Please try again.";
       toast({
         title: "Analysis failed",
-        description: "There was an error analyzing your audio. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

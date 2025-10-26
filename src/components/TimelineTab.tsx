@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Clock } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import type { AnalysisResult } from "@/utils/audioAnalyzer";
+import type { AnalysisResult } from "@/utils/comprehensiveAnalyzer";
 
 interface TimelineTabProps {
   data: AnalysisResult | null;
@@ -40,7 +40,7 @@ const TimelineTab = ({ data }: TimelineTabProps) => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(217, 33%, 28%)" />
-                <XAxis dataKey="time" stroke="hsl(215, 20%, 65%)" tick={{ fill: 'hsl(215, 20%, 65%)' }} />
+                <XAxis dataKey="timestamp" stroke="hsl(215, 20%, 65%)" tick={{ fill: 'hsl(215, 20%, 65%)' }} label={{ value: 'Time (seconds)', position: 'insideBottom', offset: -5 }} />
                 <YAxis stroke="hsl(215, 20%, 65%)" tick={{ fill: 'hsl(215, 20%, 65%)' }} />
                 <Tooltip contentStyle={{ backgroundColor: 'hsl(222, 47%, 12%)', border: '1px solid hsl(217, 33%, 28%)', borderRadius: '8px', color: 'hsl(210, 40%, 98%)' }} />
                 <Area type="monotone" dataKey="wpm" stroke="hsl(271, 91%, 65%)" fill="url(#paceGradient)" strokeWidth={2} />
