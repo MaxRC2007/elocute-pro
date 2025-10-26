@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Clock } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { AnalysisResult } from "@/utils/audioAnalyzer";
 
 interface TimelineTabProps {
@@ -10,94 +10,70 @@ interface TimelineTabProps {
 const TimelineTab = ({ data }: TimelineTabProps) => {
   if (!data) {
     return (
-      <Card className="border-primary/20">
+      <Card className="border-primary/20 bg-gradient-card backdrop-blur-xl">
         <CardContent className="flex flex-col items-center justify-center py-16">
           <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
-          <p className="text-muted-foreground text-center">
-            Upload an audio file to see your timeline visualization
-          </p>
+          <p className="text-muted-foreground text-center">Upload an audio file to see timeline analysis</p>
         </CardContent>
       </Card>
     );
   }
 
-  const fillerTimelineData = data.fillerWords.map((fw) => ({
-    timestamp: fw.timestamp,
-    type: fw.word,
-  }));
-
   return (
-    <div className="grid gap-6">
-      <Card className="border-primary/20 shadow-[0_0_20px_hsl(var(--primary)/0.05)]">
+    <div className="grid gap-6 animate-fade-in">
+      <Card className="border-primary/20 bg-gradient-card backdrop-blur-xl shadow-[0_0_30px_hsl(var(--primary)/0.15)]">
         <CardHeader>
-          <CardTitle>Speaking Pace Over Time</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-primary" />
+            Speaking Pace Over Time
+          </CardTitle>
           <CardDescription>Words per minute throughout your presentation</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={data.pace.windows}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis 
-                dataKey="timestamp" 
-                stroke="hsl(var(--muted-foreground))"
-                label={{ value: "Time (seconds)", position: "insideBottom", offset: -5 }}
-              />
-              <YAxis 
-                stroke="hsl(var(--muted-foreground))"
-                label={{ value: "WPM", angle: -90, position: "insideLeft" }}
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: "hsl(var(--card))", 
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px"
-                }}
-              />
-              <defs>
-                <linearGradient id="paceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <Area 
-                type="monotone" 
-                dataKey="wpm" 
-                stroke="hsl(var(--primary))" 
-                fill="url(#paceGradient)"
-                strokeWidth={2}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data.pace.windows}>
+                <defs>
+                  <linearGradient id="paceGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(271, 91%, 65%)" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="hsl(195, 100%, 60%)" stopOpacity={0.2}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(217, 33%, 28%)" />
+                <XAxis dataKey="time" stroke="hsl(215, 20%, 65%)" tick={{ fill: 'hsl(215, 20%, 65%)' }} />
+                <YAxis stroke="hsl(215, 20%, 65%)" tick={{ fill: 'hsl(215, 20%, 65%)' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(222, 47%, 12%)', border: '1px solid hsl(217, 33%, 28%)', borderRadius: '8px', color: 'hsl(210, 40%, 98%)' }} />
+                <Area type="monotone" dataKey="wpm" stroke="hsl(271, 91%, 65%)" fill="url(#paceGradient)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
 
-      <Card className="border-primary/20 shadow-[0_0_20px_hsl(var(--primary)/0.05)]">
+      <Card className="border-primary/20 bg-gradient-card backdrop-blur-xl shadow-[0_0_30px_hsl(var(--primary)/0.15)]">
         <CardHeader>
           <CardTitle>Filler Words Timeline</CardTitle>
-          <CardDescription>When filler words occurred in your presentation</CardDescription>
+          <CardDescription>Instances of filler words throughout your presentation</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {data.fillerWords.slice(0, 10).map((fw, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-4 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-              >
-                <div className="text-sm font-mono text-muted-foreground w-16">
-                  {Math.floor(fw.timestamp)}s
+          {data.fillerWords.length > 0 ? (
+            <div className="space-y-3">
+              {data.fillerWords.slice(0, 10).map((filler, index) => (
+                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-primary/20 hover:border-primary/40 transition-colors backdrop-blur-sm">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{index + 1}</span>
+                    <div>
+                      <p className="font-medium text-foreground">{filler.word}</p>
+                      <p className="text-sm text-muted-foreground">at {filler.timestamp.toFixed(1)}s</p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 text-xs font-medium rounded-full bg-destructive/10 text-destructive border border-destructive/20">Filler</span>
                 </div>
-                <div className="flex-1">
-                  <span className="font-semibold text-accent">{fw.word}</span>
-                  <p className="text-sm text-muted-foreground mt-1">{fw.context}</p>
-                </div>
-              </div>
-            ))}
-            {data.fillerWords.length > 10 && (
-              <p className="text-sm text-muted-foreground text-center py-2">
-                And {data.fillerWords.length - 10} more...
-              </p>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-8">No filler words detected - excellent!</p>
+          )}
         </CardContent>
       </Card>
     </div>

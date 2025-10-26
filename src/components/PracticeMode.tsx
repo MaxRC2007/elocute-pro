@@ -58,8 +58,8 @@ const PracticeMode = () => {
   };
 
   return (
-    <div className="grid gap-6">
-      <Card className="border-primary/20 shadow-[0_0_20px_hsl(var(--primary)/0.05)]">
+    <div className="grid gap-6 animate-fade-in">
+      <Card className="border-primary/20 bg-gradient-card backdrop-blur-xl shadow-[0_0_30px_hsl(var(--primary)/0.15)] overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mic className="w-5 h-5 text-primary" />

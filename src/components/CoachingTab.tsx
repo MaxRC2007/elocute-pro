@@ -50,7 +50,7 @@ const CoachingTab = ({ data }: CoachingTabProps) => {
 
   if (!data) {
     return (
-      <Card className="border-primary/20">
+      <Card className="border-primary/20 bg-gradient-card backdrop-blur-xl">
         <CardContent className="flex flex-col items-center justify-center py-16">
           <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
           <p className="text-muted-foreground text-center">
@@ -62,8 +62,8 @@ const CoachingTab = ({ data }: CoachingTabProps) => {
   }
 
   return (
-    <div className="grid gap-6">
-      <Card className="border-primary/20 shadow-[0_0_20px_hsl(var(--primary)/0.05)]">
+    <div className="grid gap-6 animate-fade-in">
+      <Card className="border-primary/20 bg-gradient-card backdrop-blur-xl shadow-[0_0_30px_hsl(var(--primary)/0.15)] overflow-hidden">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />

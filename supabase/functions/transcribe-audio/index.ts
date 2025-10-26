@@ -22,14 +22,20 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Convert base64 to binary
-    const binaryAudio = Uint8Array.from(atob(audio), (c) => c.charCodeAt(0));
+    // Decode base64 to binary
+    const base64Data = audio.includes(',') ? audio.split(',')[1] : audio;
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
 
-    // Create form data
+    // Create form data with file
     const formData = new FormData();
-    const blob = new Blob([binaryAudio], { type: "audio/webm" });
-    formData.append("file", blob, "audio.webm");
+    const audioBlob = new Blob([bytes], { type: "audio/mpeg" });
+    formData.append("file", audioBlob, "recording.mp3");
     formData.append("model", "whisper-1");
+    formData.append("language", "en");
 
     // Call Whisper API through Lovable AI Gateway
     const response = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
