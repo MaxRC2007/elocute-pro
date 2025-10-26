@@ -11,36 +11,22 @@ serve(async (req) => {
   }
 
   try {
-    const { audio } = await req.json();
-
-    if (!audio) {
-      throw new Error("No audio data provided");
-    }
-
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Decode base64 to binary safely
-    const base64Data = audio.includes(',') ? audio.split(',')[1] : audio;
-    
-    // Use Uint8Array for proper binary handling
-    const binaryLen = base64Data.length;
-    const bytes = new Uint8Array(binaryLen * 3 / 4);
-    
-    for (let i = 0, j = 0; i < binaryLen; i += 4) {
-      const chunk = base64Data.substring(i, i + 4);
-      const decoded = atob(chunk);
-      for (let k = 0; k < decoded.length; k++) {
-        bytes[j++] = decoded.charCodeAt(k);
-      }
+    // Get the file from FormData
+    const formDataRequest = await req.formData();
+    const audioFile = formDataRequest.get("audio");
+
+    if (!audioFile || !(audioFile instanceof File)) {
+      throw new Error("No audio file provided");
     }
 
-    // Create form data with file
+    // Create form data for Whisper API
     const formData = new FormData();
-    const audioBlob = new Blob([bytes], { type: "audio/mpeg" });
-    formData.append("file", audioBlob, "recording.mp3");
+    formData.append("file", audioFile);
     formData.append("model", "whisper-1");
     formData.append("language", "en");
 

@@ -25,34 +25,33 @@ const FILLER_WORDS = ["um", "uh", "like", "you know", "so", "basically", "actual
 
 export const analyzeAudio = async (file: File): Promise<AnalysisResult> => {
   try {
-    // Convert audio to base64 properly
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    let binary = '';
-    const chunkSize = 0x8000; // 32KB chunks to prevent stack overflow
-    
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-      binary += String.fromCharCode.apply(null, Array.from(chunk));
-    }
-    
-    const base64Audio = btoa(binary);
-
     // Get audio duration using Web Audio API
+    const arrayBuffer = await file.arrayBuffer();
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
     const duration = audioBuffer.duration;
 
-    // Call transcription edge function
-    const { data: transcriptData, error: transcriptError } = await supabase.functions.invoke(
-      "transcribe-audio",
+    // Create FormData to send file directly
+    const formData = new FormData();
+    formData.append('audio', file);
+
+    // Call transcription edge function with FormData
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/transcribe-audio`,
       {
-        body: { audio: base64Audio },
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: formData,
       }
     );
 
-    if (transcriptError) throw transcriptError;
+    if (!response.ok) {
+      throw new Error(`Transcription failed: ${response.statusText}`);
+    }
 
+    const transcriptData = await response.json();
     const transcript = transcriptData.text || "";
     const words = transcript.toLowerCase().split(/\s+/).filter(w => w.length > 0);
     
