@@ -22,10 +22,11 @@ const CoachingTab = ({ data }: CoachingTabProps) => {
     try {
       const { data: response, error } = await supabase.functions.invoke("ai-coach", {
         body: {
-          transcript: data.transcript,
+          transcript: data.transcript.substring(0, 500),
+          fullTranscript: data.transcript,
           fillerCount: data.fillerWords.length,
           pace: data.pace.average,
-          clarity: data.clarity.vocabularyRichness,
+          clarity: data.clarity.score || Math.round(data.clarity.vocabularyRichness * 100),
         },
       });
 

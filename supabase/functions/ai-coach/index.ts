@@ -11,47 +11,60 @@ serve(async (req) => {
   }
 
   try {
-    const { transcript, fillerCount, pace, clarity } = await req.json();
+    const { transcript, fillerCount, pace, clarity, fullTranscript } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    if (!GROQ_API_KEY) {
+      throw new Error("GROQ_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an expert presentation coach with 20 years of experience coaching executives, TED speakers, and keynote presenters. Analyze presentations and provide specific, actionable feedback.`;
+    const systemPrompt = `You are an expert presentation coach with years of experience helping people improve their public speaking skills. Provide specific, actionable feedback with concrete examples.`;
 
-    const userPrompt = `Analyze this presentation and provide 5 specific, prioritized coaching tips:
+    const userPrompt = `Analyze this presentation and provide exactly 5 coaching tips:
 
-Transcript: "${transcript.substring(0, 1000)}..."
-Filler words: ${fillerCount}
-Speaking pace: ${Math.round(pace)} WPM
-Vocabulary diversity: ${(clarity * 100).toFixed(1)}%
+PRESENTATION METRICS:
+- Filler Words: ${fillerCount} occurrences
+- Average Speaking Pace: ${Math.round(pace)} words per minute
+- Clarity Score: ${clarity}/100
 
-Format your response as a clear, encouraging analysis with:
-1. Overall assessment (2-3 sentences)
-2. Top 5 specific improvements with before/after examples
-3. One standout strength to build on
+TRANSCRIPT:
+${(fullTranscript || transcript).substring(0, 1000)}
 
-Be personal, specific, and actionable. Reference actual content from the transcript.`;
+Please provide exactly 5 coaching tips in the following format:
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+1. [Tip Title]
+[Detailed explanation of the issue and why it matters]
+Action: [Specific action to take]
+
+2. [Next tip...]
+
+Focus on:
+- Reducing filler words
+- Optimizing speaking pace
+- Improving clarity and confidence
+- Engaging the audience
+- Professional delivery techniques`;
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "llama-3.1-70b-versatile",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        temperature: 0.7,
+        max_tokens: 1500,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
+      console.error("Groq API error:", response.status, errorText);
       throw new Error(`AI coaching failed: ${response.status}`);
     }
 
