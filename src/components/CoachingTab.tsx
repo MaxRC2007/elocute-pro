@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle, Sparkles, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getSupabase } from "@/lib/supabaseClient";
-import type { AnalysisResult } from "@/utils/comprehensiveAnalyzer";
+import { supabase } from "@/integrations/supabase/client";
+import type { AnalysisResult } from "@/utils/audioAnalyzer";
 
 interface CoachingTabProps {
   data: AnalysisResult | null;
@@ -20,7 +20,6 @@ const CoachingTab = ({ data }: CoachingTabProps) => {
 
     setIsGenerating(true);
     try {
-      const supabase = getSupabase();
       const { data: response, error } = await supabase.functions.invoke("ai-coach", {
         body: {
           transcript: data.transcript,

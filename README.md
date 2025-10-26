@@ -1,32 +1,8 @@
-# PROJECT PRISM - AI-Powered Presentation Coach
-
-Transform your speaking skills with real-time AI analysis, filler word detection, and personalized coaching.
+# Welcome to your Lovable project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/7e138d99-165a-4ebc-8e4c-804ec77e2635
-
-## Features
-
-### Core Functionality
-- **Audio Upload**: Drag-and-drop support for MP3, WAV, M4A, and WebM files (up to 50MB)
-- **Speech-to-Text**: Automatic transcription using Web Speech API or Supabase Edge Functions
-- **Smart Analysis**:
-  - Filler word detection (um, uh, like, you know, etc.)
-  - Speaking pace calculation (words per minute)
-  - Clarity score and vocabulary richness
-  - Silent pause detection
-  - Pitch variance analysis
-- **AI Coaching**: Personalized feedback powered by Gemini AI
-- **Interactive Dashboard**: Visual timeline with charts and metrics
-- **Real-time Waveform**: Audio visualization with Canvas API
-
-### Visual Design
-- Dark gradient background (navy to deep purple)
-- Glassmorphic cards with backdrop blur
-- Animated hero section with floating particles
-- Smooth transitions and micro-interactions
-- Responsive design for all screen sizes
 
 ## How can I edit this code?
 

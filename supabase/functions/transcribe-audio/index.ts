@@ -1,17 +1,13 @@
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-Deno.serve(async (req: Request) => {
+serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 200,
-      headers: corsHeaders,
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -26,32 +22,22 @@ Deno.serve(async (req: Request) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Convert base64 to binary in chunks to prevent memory issues
-    console.log("Processing audio data...");
-    const base64Data = audio.replace(/^data:audio\/\w+;base64,/, '');
-    
-    let binaryString = '';
-    const chunkSize = 32768;
-    
-    for (let i = 0; i < base64Data.length; i += chunkSize) {
-      const chunk = base64Data.slice(i, i + chunkSize);
-      binaryString += atob(chunk);
-    }
-    
+    // Decode base64 to binary
+    const base64Data = audio.includes(',') ? audio.split(',')[1] : audio;
+    const binaryString = atob(base64Data);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    console.log(`Audio size: ${bytes.length} bytes`);
-
-    // Create form data for Whisper API
+    // Create form data with file
     const formData = new FormData();
     const audioBlob = new Blob([bytes], { type: "audio/mpeg" });
-    formData.append("file", audioBlob, "audio.mp3");
+    formData.append("file", audioBlob, "recording.mp3");
     formData.append("model", "whisper-1");
+    formData.append("language", "en");
 
-    console.log("Sending to Lovable AI Gateway...");
+    // Call Whisper API through Lovable AI Gateway
     const response = await fetch("https://ai.gateway.lovable.dev/v1/audio/transcriptions", {
       method: "POST",
       headers: {
@@ -62,12 +48,11 @@ Deno.serve(async (req: Request) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Lovable AI error:", response.status, errorText);
-      throw new Error(`Transcription failed: ${response.status} - ${errorText}`);
+      console.error("Transcription API error:", response.status, errorText);
+      throw new Error(`Transcription failed: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log("Transcription successful");
 
     return new Response(JSON.stringify({ text: result.text }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

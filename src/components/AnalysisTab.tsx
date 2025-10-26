@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AlertCircle, MessageSquare } from "lucide-react";
-import type { AnalysisResult } from "@/utils/comprehensiveAnalyzer";
+import type { AnalysisResult } from "@/utils/audioAnalyzer";
 
 interface AnalysisTabProps {
   data: AnalysisResult | null;
