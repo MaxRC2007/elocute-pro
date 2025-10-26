@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabase } from "@/lib/supabaseClient";
 import { processAudioFile } from "@/lib/audioProcessor";
 import { transcribeAudio, isSpeechRecognitionSupported } from "@/lib/speechRecognition";
 
@@ -121,6 +121,7 @@ export const analyzeAudio = async (file: File): Promise<AnalysisResult> => {
     let confidence = 0;
 
     try {
+      const supabase = getSupabase();
       const { data: transcriptData, error: transcriptError } = await supabase.functions.invoke(
         "transcribe-audio",
         {
